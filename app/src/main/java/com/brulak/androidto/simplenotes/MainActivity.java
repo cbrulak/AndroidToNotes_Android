@@ -1,5 +1,6 @@
 package com.brulak.androidto.simplenotes;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -60,39 +62,67 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final String note = mEditText.getText().toString();
                 final EventItem item = new EventItem(note);
-                mAdapter.addItem(item);
                 mEditText.setText("");
                 mLayoutManager.scrollToPosition(0);
 
-                Firebase noteRef = myFirebaseRef.child(item.text);
+                Firebase noteRef = myFirebaseRef.child("events").child(item.text);
 
                 noteRef.setValue(item);
             }
         });
 
+        final Context context = this;
 
-        myFirebaseRef.addValueEventListener(new ValueEventListener() {
+        myFirebaseRef.child("events").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println("There are " + snapshot.getChildrenCount() + " blog posts");
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    if(postSnapshot != null) {
+                    if (postSnapshot != null) {
 
                         EventItem item = postSnapshot.getValue(EventItem.class);
-
-                        //String note = (String) postSnapshot.getValue();
-
-                       // EventItem item = new EventItem(note);
-                        mAdapter.addItem(item);
+                        //mAdapter.addItem(item);
                     }
 
                 }
             }
 
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
+        });
+
+        myFirebaseRef.child("events").addChildEventListener(new ChildEventListener() {
+            // Retrieve new posts as they are added to the database
+            @Override
+            public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
+                EventItem item = snapshot.getValue(EventItem.class);
+                mAdapter.addItem(item);
+                //... ChildEventListener also defines onChildChanged, onChildRemoved,
+                //    onChildMoved and onCanceled, covered in later sections.
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+
         });
     }
 
