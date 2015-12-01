@@ -6,6 +6,8 @@ package com.brulak.androidto.simplenotes;
 public class EventItem {
     public String text;
 
+    public EventItem() {}
+
     public EventItem(String text) {
         this.text = text;
     }

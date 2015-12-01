@@ -14,7 +14,10 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,14 +37,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        View contentView = findViewById(R.id.content_main);
 
 
         Firebase.setAndroidContext(this);
-        final Firebase myFirebaseRef = new Firebase("https://blazing-torch-3193.firebaseio.com/");
+        final Firebase myFirebaseRef = new Firebase("https://androidto-basic.firebaseio.com");
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mEditText = (EditText) findViewById(R.id.edit_text);
-        mButton = (Button) findViewById(R.id.button);
+        mButton = (Button) contentView.findViewById(R.id.button);
 
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -63,6 +67,31 @@ public class MainActivity extends AppCompatActivity {
                 Firebase noteRef = myFirebaseRef.child(item.text);
 
                 noteRef.setValue(item);
+            }
+        });
+
+
+        myFirebaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                System.out.println("There are " + snapshot.getChildrenCount() + " blog posts");
+                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                    if(postSnapshot != null) {
+
+                        EventItem item = postSnapshot.getValue(EventItem.class);
+
+                        //String note = (String) postSnapshot.getValue();
+
+                       // EventItem item = new EventItem(note);
+                        mAdapter.addItem(item);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
     }
