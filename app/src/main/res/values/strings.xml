@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SimpleNotes</string>
+    <string name="app_name">AndroidTOEvents</string>
     <string name="action_settings">Settings</string>
     <string name="add_note">New Event</string>
 </resources>
