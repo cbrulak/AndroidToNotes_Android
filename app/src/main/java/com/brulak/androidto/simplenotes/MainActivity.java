@@ -41,9 +41,12 @@ public class MainActivity extends AppCompatActivity {
 
         View contentView = findViewById(R.id.content_main);
 
+        Firebase.getDefaultConfig().setPersistenceEnabled(true);
 
         Firebase.setAndroidContext(this);
         final Firebase myFirebaseRef = new Firebase("https://androidto-sec.firebaseio.com");
+
+
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mEditText = (EditText) findViewById(R.id.edit_text);
